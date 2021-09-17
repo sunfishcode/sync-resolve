@@ -12,6 +12,7 @@ authors = [
     "Dan Gohman <dev@sunfishcode.online>"
 ]
 edition = "2018"
+exclude = ["/.github"]
 
 [dependencies]
 idna = "0.2.3"
