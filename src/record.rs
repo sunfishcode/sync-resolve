@@ -3,7 +3,7 @@
 use std::mem::transmute;
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-use message::{DecodeError, EncodeError, MsgReader, MsgWriter};
+use crate::message::{DecodeError, EncodeError, MsgReader, MsgWriter};
 
 /// Represents the class of data in a message.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

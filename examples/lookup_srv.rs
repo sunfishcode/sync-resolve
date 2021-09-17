@@ -1,5 +1,3 @@
-extern crate resolve;
-
 use std::env::args;
 
 use resolve::record::Srv;

@@ -1,7 +1,5 @@
 //! Example demonstrating a resolver using custom DNS servers
 
-extern crate resolve;
-
 use std::env::args;
 
 use resolve::{DnsConfig, DnsResolver};

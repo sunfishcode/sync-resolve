@@ -3,8 +3,8 @@
 use std::net::{IpAddr, Ipv6Addr, SocketAddr, ToSocketAddrs, UdpSocket};
 use std::{fmt, io};
 
-use address::socket_address_equal;
-use message::{DecodeError, DnsError, EncodeError, Message, MESSAGE_LIMIT};
+use crate::address::socket_address_equal;
+use crate::message::{DecodeError, DnsError, EncodeError, Message, MESSAGE_LIMIT};
 
 /// Represents a socket transmitting DNS messages.
 pub struct DnsSocket {

@@ -12,8 +12,8 @@ use std::vec::IntoIter;
 
 use rand::random;
 
-use idna;
-use record::{Class, Record, RecordType};
+use crate::idna;
+use crate::record::{Class, Record, RecordType};
 
 /// Maximum size of a DNS message, in bytes.
 pub const MESSAGE_LIMIT: usize = 0xffff;
@@ -1100,7 +1100,7 @@ mod test {
         is_valid_name, EncodeError, Header, Message, MsgReader, MsgWriter, OpCode, Qr, Question,
         RCode, MESSAGE_LIMIT,
     };
-    use record::{Class, RecordType};
+    use crate::record::{Class, RecordType};
 
     #[test]
     fn test_idna_name() {

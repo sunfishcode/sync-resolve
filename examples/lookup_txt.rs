@@ -1,5 +1,3 @@
-extern crate resolve;
-
 use std::env::args;
 use std::str;
 

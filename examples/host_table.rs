@@ -1,5 +1,3 @@
-extern crate resolve;
-
 use resolve::hosts::{host_file, load_hosts};
 
 fn main() {

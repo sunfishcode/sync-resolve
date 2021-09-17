@@ -3,17 +3,14 @@
 #![deny(missing_docs)]
 
 extern crate idna as external_idna;
-#[macro_use]
-extern crate log;
-extern crate rand;
 
-pub use address::address_name;
-pub use config::DnsConfig;
-pub use idna::{to_ascii, to_unicode};
-pub use message::{DecodeError, EncodeError, Message, Question, Resource, MESSAGE_LIMIT};
-pub use record::{Class, Record, RecordType};
-pub use resolver::{resolve_addr, resolve_host, DnsResolver};
-pub use socket::{DnsSocket, Error};
+pub use crate::address::address_name;
+pub use crate::config::DnsConfig;
+pub use crate::idna::{to_ascii, to_unicode};
+pub use crate::message::{DecodeError, EncodeError, Message, Question, Resource, MESSAGE_LIMIT};
+pub use crate::record::{Class, Record, RecordType};
+pub use crate::resolver::{resolve_addr, resolve_host, DnsResolver};
+pub use crate::socket::{DnsSocket, Error};
 
 pub mod address;
 pub mod config;

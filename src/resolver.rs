@@ -6,11 +6,13 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, ToSocketAddrs};
 use std::time::{Duration, Instant};
 use std::vec::IntoIter;
 
-use address::address_name;
-use config::DnsConfig;
-use message::{Message, Qr, Question, MESSAGE_LIMIT};
-use record::{Class, Ptr, Record, RecordType, A, AAAA};
-use socket::{DnsSocket, Error};
+use log::info;
+
+use crate::address::address_name;
+use crate::config::DnsConfig;
+use crate::message::{Message, Qr, Question, MESSAGE_LIMIT};
+use crate::record::{Class, Ptr, Record, RecordType, A, AAAA};
+use crate::socket::{DnsSocket, Error};
 
 /// Performs resolution operations
 pub struct DnsResolver {

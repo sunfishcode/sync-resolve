@@ -6,8 +6,8 @@ use std::io::{self, BufRead, BufReader};
 use std::net::{IpAddr, SocketAddr};
 use std::time::Duration;
 
-use config::DnsConfig;
-use hostname::get_hostname;
+use crate::config::DnsConfig;
+use crate::hostname::get_hostname;
 
 /// port for DNS communication
 const DNS_PORT: u16 = 53;

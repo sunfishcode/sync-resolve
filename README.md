@@ -16,12 +16,6 @@ Add this to your `Cargo.toml`:
 resolve = "0.2"
 ```
 
-And this to your crate root:
-
-```rust
-extern crate resolve;
-```
-
 ## License
 
 `resolve` is distributed under the terms of both the MIT license and the

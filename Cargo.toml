@@ -14,6 +14,8 @@ readme = "README.md"
 version = "0.2.0"
 authors = ["Murarth <murarth@gmail.com>"]
 
+edition = "2018"
+
 [dependencies]
 idna = "0.2.3"
 log = "0.4.14"

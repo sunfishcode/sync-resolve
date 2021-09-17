@@ -3,7 +3,7 @@
 
 use std::borrow::Cow::{self, Borrowed, Owned};
 
-use external_idna;
+use crate::external_idna;
 
 /// Indicates an error in encoding or decoding Punycode data
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

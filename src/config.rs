@@ -51,7 +51,7 @@ impl DnsConfig {
 
 #[cfg(unix)]
 fn default_config_impl() -> io::Result<DnsConfig> {
-    use resolv_conf::load;
+    use crate::resolv_conf::load;
     load()
 }
 
