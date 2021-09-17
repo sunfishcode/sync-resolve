@@ -3,8 +3,8 @@
 use std::cmp::min;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-use std::time::Duration;
 use std::net::{IpAddr, SocketAddr};
+use std::time::Duration;
 
 use config::DnsConfig;
 use hostname::get_hostname;
@@ -37,7 +37,7 @@ pub const MAX_TIMEOUT: u64 = 30;
 pub const RESOLV_CONF_PATH: &'static str = "/etc/resolv.conf";
 
 fn default_config() -> DnsConfig {
-    DnsConfig{
+    DnsConfig {
         name_servers: Vec::new(),
         search: Vec::new(),
 
@@ -71,28 +71,24 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
 
         let name = match words.next() {
             Some(name) => name,
-            None => continue
+            None => continue,
         };
 
         match name {
-            "nameserver" => {
-                match words.next() {
-                    Some(ip) => {
-                        if cfg.name_servers.len() < MAX_NAME_SERVERS {
-                            if let Ok(ip) = ip.parse::<IpAddr>() {
-                                cfg.name_servers.push(SocketAddr::new(ip, DNS_PORT))
-                            }
+            "nameserver" => match words.next() {
+                Some(ip) => {
+                    if cfg.name_servers.len() < MAX_NAME_SERVERS {
+                        if let Ok(ip) = ip.parse::<IpAddr>() {
+                            cfg.name_servers.push(SocketAddr::new(ip, DNS_PORT))
                         }
                     }
-                    None => ()
                 }
-            }
-            "domain" => {
-                match words.next() {
-                    Some(domain) => cfg.search = vec![domain.to_owned()],
-                    None => ()
-                }
-            }
+                None => (),
+            },
+            "domain" => match words.next() {
+                Some(domain) => cfg.search = vec![domain.to_owned()],
+                None => (),
+            },
             "search" => {
                 cfg.search = words.map(|s| s.to_owned()).collect();
             }
@@ -100,7 +96,7 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
                 for opt in words {
                     let (opt, value) = match opt.find(':') {
                         Some(pos) => (&opt[..pos], &opt[pos + 1..]),
-                        None => (opt, "")
+                        None => (opt, ""),
                     };
 
                     match opt {
@@ -111,8 +107,7 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
                         }
                         "timeout" => {
                             if let Ok(n) = value.parse() {
-                                cfg.timeout = Duration::from_secs(
-                                    min(n, MAX_TIMEOUT));
+                                cfg.timeout = Duration::from_secs(min(n, MAX_TIMEOUT));
                             }
                         }
                         "attempts" => {
@@ -122,17 +117,19 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
                         }
                         "rotate" => cfg.rotate = true,
                         "inet6" => cfg.use_inet6 = true,
-                        _ => ()
+                        _ => (),
                     }
                 }
             }
-            _ => ()
+            _ => (),
         }
     }
 
     if cfg.name_servers.is_empty() {
-        return Err(io::Error::new(io::ErrorKind::Other,
-            "no nameserver directives in resolv.conf"))
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            "no nameserver directives in resolv.conf",
+        ));
     }
 
     if cfg.search.is_empty() {
@@ -148,8 +145,8 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
 
 #[cfg(test)]
 mod test {
-    use std::io::Cursor;
     use super::{parse, MAX_TIMEOUT};
+    use std::io::Cursor;
 
     const TEST_CONFIG: &'static str = "\
         nameserver 127.0.0.1

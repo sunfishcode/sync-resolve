@@ -35,7 +35,7 @@ impl DnsConfig {
     /// Returns a `DnsConfig` using the given set of name servers,
     /// setting all other fields to generally sensible default values.
     pub fn with_name_servers(name_servers: Vec<SocketAddr>) -> DnsConfig {
-        DnsConfig{
+        DnsConfig {
             name_servers: name_servers,
             search: Vec::new(),
 
@@ -59,5 +59,8 @@ fn default_config_impl() -> io::Result<DnsConfig> {
 fn default_config_impl() -> io::Result<DnsConfig> {
     // TODO: Get a list of nameservers from Windows API.
     // For now, return an IO error.
-    Err(io::Error::new(io::ErrorKind::Other, "Nameserver list not available on Windows"))
+    Err(io::Error::new(
+        io::ErrorKind::Other,
+        "Nameserver list not available on Windows",
+    ))
 }
