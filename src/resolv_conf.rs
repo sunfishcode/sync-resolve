@@ -34,7 +34,7 @@ pub const MAX_N_DOTS: u32 = 15;
 pub const MAX_TIMEOUT: u64 = 30;
 
 /// Path to system `resolv.conf`
-pub const RESOLV_CONF_PATH: &'static str = "/etc/resolv.conf";
+pub const RESOLV_CONF_PATH: &str = "/etc/resolv.conf";
 
 fn default_config() -> DnsConfig {
     DnsConfig {
@@ -75,20 +75,20 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
         };
 
         match name {
-            "nameserver" => match words.next() {
-                Some(ip) => {
+            "nameserver" => {
+                if let Some(ip) = words.next() {
                     if cfg.name_servers.len() < MAX_NAME_SERVERS {
                         if let Ok(ip) = ip.parse::<IpAddr>() {
                             cfg.name_servers.push(SocketAddr::new(ip, DNS_PORT))
                         }
                     }
                 }
-                None => (),
-            },
-            "domain" => match words.next() {
-                Some(domain) => cfg.search = vec![domain.to_owned()],
-                None => (),
-            },
+            }
+            "domain" => {
+                if let Some(domain) = words.next() {
+                    cfg.search = vec![domain.to_owned()];
+                }
+            }
             "search" => {
                 cfg.search = words.map(|s| s.to_owned()).collect();
             }

@@ -120,8 +120,7 @@ impl<'a> MsgReader<'a> {
 
     /// Reads all remaining bytes.
     pub fn read_to_end(&mut self) -> Result<Vec<u8>, DecodeError> {
-        let mut res = Vec::with_capacity(self.remaining());
-        res.resize(self.remaining(), 0);
+        let mut res = vec![0_u8; self.remaining()];
         self.read(&mut res)?;
         Ok(res)
     }
@@ -136,8 +135,7 @@ impl<'a> MsgReader<'a> {
     /// > characters in length (including the length octet).
     pub fn read_character_string(&mut self) -> Result<Vec<u8>, DecodeError> {
         let length_octet = self.read_byte()? as usize;
-        let mut res = Vec::with_capacity(length_octet);
-        res.resize(length_octet, 0);
+        let mut res = vec![0_u8; length_octet];
         self.read(&mut res)?;
         Ok(res)
     }
@@ -836,7 +834,7 @@ struct FullHeader {
 }
 
 impl FullHeader {
-    fn to_header(&self) -> Header {
+    fn to_header(self) -> Header {
         Header {
             id: self.id,
             qr: self.qr,

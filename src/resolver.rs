@@ -93,17 +93,21 @@ impl DnsResolver {
                         .err();
 
                     if res.is_empty() {
-                        err = err.or(self
-                            .resolve_host_v4(&name, |ip| res.push(IpAddr::V6(ip.to_ipv6_mapped())))
-                            .err());
+                        err = err.or_else(|| {
+                            self.resolve_host_v4(&name, |ip| {
+                                res.push(IpAddr::V6(ip.to_ipv6_mapped()))
+                            })
+                            .err()
+                        });
                     }
                 } else {
                     err = self
                         .resolve_host_v4(&name, |ip| res.push(IpAddr::V4(ip)))
                         .err();
-                    err = err.or(self
-                        .resolve_host_v6(&name, |ip| res.push(IpAddr::V6(ip)))
-                        .err());
+                    err = err.or_else(|| {
+                        self.resolve_host_v6(&name, |ip| res.push(IpAddr::V6(ip)))
+                            .err()
+                    });
                 }
 
                 if !res.is_empty() {
@@ -248,7 +252,7 @@ impl DnsResolver {
                         if timeout < passed {
                             timeout = Duration::from_secs(0);
                         } else {
-                            timeout = timeout - passed;
+                            timeout -= passed;
                         }
                     }
                     Ok(Some(msg)) => {
