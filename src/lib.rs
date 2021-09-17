@@ -3,7 +3,6 @@
 #![deny(missing_docs)]
 
 extern crate idna as external_idna;
-extern crate libc;
 #[macro_use]
 extern crate log;
 extern crate rand;
