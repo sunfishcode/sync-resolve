@@ -1,8 +1,7 @@
 //! Low-level UDP socket operations
 
-use std::fmt;
-use std::io;
 use std::net::{IpAddr, Ipv6Addr, SocketAddr, ToSocketAddrs, UdpSocket};
+use std::{fmt, io};
 
 use address::socket_address_equal;
 use message::{DecodeError, DnsError, EncodeError, Message, MESSAGE_LIMIT};
@@ -24,7 +23,7 @@ impl DnsSocket {
     /// Returns a `DnsSocket`, bound to the given address.
     pub fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<DnsSocket> {
         Ok(DnsSocket {
-            sock: try!(UdpSocket::bind(addr)),
+            sock: UdpSocket::bind(addr)?,
         })
     }
 
@@ -36,8 +35,8 @@ impl DnsSocket {
     /// Sends a message to the given address.
     pub fn send_message<A: ToSocketAddrs>(&self, message: &Message, addr: A) -> Result<(), Error> {
         let mut buf = [0; MESSAGE_LIMIT];
-        let data = try!(message.encode(&mut buf));
-        try!(self.sock.send_to(data, addr));
+        let data = message.encode(&mut buf)?;
+        self.sock.send_to(data, addr)?;
         Ok(())
     }
 
@@ -49,15 +48,16 @@ impl DnsSocket {
         &self,
         buf: &'buf mut [u8],
     ) -> Result<(Message<'buf>, SocketAddr), Error> {
-        let (n, addr) = try!(self.sock.recv_from(buf));
+        let (n, addr) = self.sock.recv_from(buf)?;
 
-        let msg = try!(Message::decode(&buf[..n]));
+        let msg = Message::decode(&buf[..n])?;
         Ok((msg, addr))
     }
 
     /// Attempts to read a DNS message. The message will only be decoded if the
-    /// remote address matches `addr`. If a packet is received from a non-matching
-    /// address, the message is not decoded and `Ok(None)` is returned.
+    /// remote address matches `addr`. If a packet is received from a
+    /// non-matching address, the message is not decoded and `Ok(None)` is
+    /// returned.
     ///
     /// The buffer should be exactly `MESSAGE_LIMIT` bytes in length.
     pub fn recv_message<'buf>(
@@ -65,12 +65,12 @@ impl DnsSocket {
         addr: &SocketAddr,
         buf: &'buf mut [u8],
     ) -> Result<Option<Message<'buf>>, Error> {
-        let (n, recv_addr) = try!(self.sock.recv_from(buf));
+        let (n, recv_addr) = self.sock.recv_from(buf)?;
 
         if !socket_address_equal(&recv_addr, addr) {
             Ok(None)
         } else {
-            let msg = try!(Message::decode(&buf[..n]));
+            let msg = Message::decode(&buf[..n])?;
             Ok(Some(msg))
         }
     }
@@ -90,7 +90,8 @@ pub enum Error {
 }
 
 impl Error {
-    /// Returns `true` if the error is the result of an operation having timed out.
+    /// Returns `true` if the error is the result of an operation having timed
+    /// out.
     pub fn is_timeout(&self) -> bool {
         match *self {
             Error::IoError(ref e) => {

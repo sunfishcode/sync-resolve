@@ -36,7 +36,7 @@ impl DnsConfig {
     /// setting all other fields to generally sensible default values.
     pub fn with_name_servers(name_servers: Vec<SocketAddr>) -> DnsConfig {
         DnsConfig {
-            name_servers: name_servers,
+            name_servers,
             search: Vec::new(),
 
             n_dots: 1,

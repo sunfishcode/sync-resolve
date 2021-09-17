@@ -54,14 +54,14 @@ fn default_config() -> DnsConfig {
 /// on its contents. If the file cannot be read or lacks required directives,
 /// an error is returned.
 pub fn load() -> io::Result<DnsConfig> {
-    parse(BufReader::new(try!(File::open(RESOLV_CONF_PATH))))
+    parse(BufReader::new(File::open(RESOLV_CONF_PATH)?))
 }
 
 fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
     let mut cfg = default_config();
 
     for line in r.lines() {
-        let line = try!(line);
+        let line = line?;
 
         if line.is_empty() || line.starts_with(|c| c == '#' || c == ';') {
             continue;
@@ -133,7 +133,7 @@ fn parse<R: BufRead>(r: R) -> io::Result<DnsConfig> {
     }
 
     if cfg.search.is_empty() {
-        let host = try!(get_hostname());
+        let host = get_hostname()?;
 
         if let Some(pos) = host.find('.') {
             cfg.search = vec![host[pos + 1..].to_owned()];

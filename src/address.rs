@@ -2,7 +2,8 @@
 
 use std::net::{IpAddr, SocketAddr};
 
-/// Compares two `IpAddr`s, checking for IPv6-compatible or IPv6-mapped addresses.
+/// Compares two `IpAddr`s, checking for IPv6-compatible or IPv6-mapped
+/// addresses.
 pub fn address_equal(a: &IpAddr, b: &IpAddr) -> bool {
     match (*a, *b) {
         // Simple comparisons; (V4 == V4) or (V6 == V6)
@@ -17,7 +18,8 @@ pub fn address_equal(a: &IpAddr, b: &IpAddr) -> bool {
     }
 }
 
-/// Compares two `SocketAddr`s, checking for IPv6-compatible or IPv6-mapped addresses.
+/// Compares two `SocketAddr`s, checking for IPv6-compatible or IPv6-mapped
+/// addresses.
 pub fn socket_address_equal(a: &SocketAddr, b: &SocketAddr) -> bool {
     a.port() == b.port() && address_equal(&a.ip(), &b.ip())
 }

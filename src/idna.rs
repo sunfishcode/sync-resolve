@@ -9,9 +9,9 @@ use external_idna;
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Error;
 
-/// Converts a label or host to its ASCII format. If the string is already ASCII,
-/// it will be returned unmodified. If an error is encountered in encoding,
-/// `Err` will be returned.
+/// Converts a label or host to its ASCII format. If the string is already
+/// ASCII, it will be returned unmodified. If an error is encountered in
+/// encoding, `Err` will be returned.
 pub fn to_ascii(s: &str) -> Result<Cow<str>, Error> {
     if s.is_ascii() {
         Ok(Borrowed(s))

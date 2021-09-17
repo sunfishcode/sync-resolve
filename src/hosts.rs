@@ -20,7 +20,8 @@ impl HostTable {
         self.find_host_by_name(name).map(|h| h.address)
     }
 
-    /// Returns the canonical name for the first host matching the given address.
+    /// Returns the canonical name for the first host matching the given
+    /// address.
     ///
     /// If no match is found, `None` is returned.
     pub fn find_name(&self, addr: IpAddr) -> Option<&str> {
@@ -82,10 +83,10 @@ fn host_file_impl() -> PathBuf {
 /// If an error is encountered in opening the file or reading its contents
 /// or if the file is malformed, the error is returned.
 pub fn load_hosts(path: &Path) -> io::Result<HostTable> {
-    let mut f = try!(File::open(path));
+    let mut f = File::open(path)?;
     let mut buf = String::new();
 
-    try!(f.read_to_string(&mut buf));
+    f.read_to_string(&mut buf)?;
     parse_host_table(&buf)
 }
 
@@ -129,7 +130,7 @@ pub fn parse_host_table(data: &str) -> io::Result<HostTable> {
         });
     }
 
-    Ok(HostTable { hosts: hosts })
+    Ok(HostTable { hosts })
 }
 
 #[cfg(test)]

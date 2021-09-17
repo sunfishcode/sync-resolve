@@ -114,7 +114,7 @@ impl<'a> MsgReader<'a> {
     /// Reads a single byte from the message.
     pub fn read_byte(&mut self) -> Result<u8, DecodeError> {
         let mut buf = [0];
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
         Ok(buf[0])
     }
 
@@ -122,7 +122,7 @@ impl<'a> MsgReader<'a> {
     pub fn read_to_end(&mut self) -> Result<Vec<u8>, DecodeError> {
         let mut res = Vec::with_capacity(self.remaining());
         res.resize(self.remaining(), 0);
-        try!(self.read(&mut res));
+        self.read(&mut res)?;
         Ok(res)
     }
 
@@ -135,24 +135,24 @@ impl<'a> MsgReader<'a> {
     /// > treated as binary information, and can be up to 256
     /// > characters in length (including the length octet).
     pub fn read_character_string(&mut self) -> Result<Vec<u8>, DecodeError> {
-        let length_octet = try!(self.read_byte()) as usize;
+        let length_octet = self.read_byte()? as usize;
         let mut res = Vec::with_capacity(length_octet);
         res.resize(length_octet, 0);
-        try!(self.read(&mut res));
+        self.read(&mut res)?;
         Ok(res)
     }
 
     /// Reads a big-endian unsigned 16 bit integer.
     pub fn read_u16(&mut self) -> Result<u16, DecodeError> {
         let mut buf = [0; 2];
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
         Ok(u16::from_be(unsafe { transmute(buf) }))
     }
 
     /// Reads a big-endian unsigned 32 bit integer.
     pub fn read_u32(&mut self) -> Result<u32, DecodeError> {
         let mut buf = [0; 4];
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
         Ok(u32::from_be(unsafe { transmute(buf) }))
     }
 
@@ -174,7 +174,7 @@ impl<'a> MsgReader<'a> {
         let mut total_read = 0;
 
         loop {
-            let len = try!(self.read_byte());
+            let len = self.read_byte()?;
 
             if len == 0 {
                 if total_read + 1 > NAME_LIMIT {
@@ -198,7 +198,7 @@ impl<'a> MsgReader<'a> {
                 // The beginning of a pointer reference. 14 bit denote the
                 // offset from the start of the message.
                 let hi = (len & 0b00111111) as u64;
-                let lo = try!(self.read_byte()) as u64;
+                let lo = self.read_byte()? as u64;
                 let offset = (hi << 8) | lo;
 
                 // To prevent an infinite loop, we require the pointer to
@@ -220,7 +220,7 @@ impl<'a> MsgReader<'a> {
             }
             total_read += 1 + len as usize;
 
-            try!(self.read_segment(&mut res, len as usize));
+            self.read_segment(&mut res, len as usize)?;
         }
 
         if res.is_empty() {
@@ -239,7 +239,7 @@ impl<'a> MsgReader<'a> {
     fn read_segment(&mut self, buf: &mut String, len: usize) -> Result<(), DecodeError> {
         let mut bytes = [0; 64];
 
-        try!(self.read(&mut bytes[..len]));
+        self.read(&mut bytes[..len])?;
 
         let seg = &bytes[..len];
 
@@ -283,7 +283,7 @@ impl<'a> MsgReader<'a> {
     fn read_header(&mut self) -> Result<FullHeader, DecodeError> {
         let mut buf = [0; 12];
 
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
 
         let hdr: HeaderData = unsafe { transmute(buf) };
 
@@ -313,7 +313,7 @@ impl<'a> MsgReader<'a> {
         let ar_count = u16::from_be(hdr.ar_count);
 
         Ok(FullHeader {
-            id: id,
+            id,
             qr: if qr == 0 { Qr::Query } else { Qr::Response },
             op: OpCode::from_u8(op),
             authoritative: aa != 0,
@@ -321,20 +321,20 @@ impl<'a> MsgReader<'a> {
             recursion_desired: rd != 0,
             recursion_available: ra != 0,
             rcode: RCode::from_u8(rc),
-            qd_count: qd_count,
-            an_count: an_count,
-            ns_count: ns_count,
-            ar_count: ar_count,
+            qd_count,
+            an_count,
+            ns_count,
+            ar_count,
         })
     }
 
     /// Reads a question item
     fn read_question(&mut self) -> Result<Question, DecodeError> {
-        let name = try!(self.read_name());
+        let name = self.read_name()?;
 
         let mut buf = [0; 4];
 
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
 
         let msg: QuestionData = unsafe { transmute(buf) };
 
@@ -342,7 +342,7 @@ impl<'a> MsgReader<'a> {
         let q_class = u16::from_be(msg.q_class);
 
         Ok(Question {
-            name: name,
+            name,
             q_type: RecordType::from_u16(q_type),
             q_class: Class::from_u16(q_class),
         })
@@ -350,11 +350,11 @@ impl<'a> MsgReader<'a> {
 
     /// Reads a resource record item
     fn read_resource(&mut self) -> Result<Resource<'a>, DecodeError> {
-        let name = try!(self.read_name());
+        let name = self.read_name()?;
 
         let mut buf = [0; 10];
 
-        try!(self.read(&mut buf));
+        self.read(&mut buf)?;
 
         let msg: ResourceData = unsafe { transmute(buf) };
 
@@ -370,12 +370,12 @@ impl<'a> MsgReader<'a> {
         self.consume(length as u64);
 
         Ok(Resource {
-            name: name,
+            name,
             r_type: RecordType::from_u16(r_type),
             r_class: Class::from_u16(r_class),
-            ttl: ttl,
+            ttl,
             data: Borrowed(r_data),
-            offset: offset,
+            offset,
         })
     }
 }
@@ -386,7 +386,8 @@ pub struct MsgWriter<'a> {
 }
 
 impl<'a> MsgWriter<'a> {
-    /// Constructs a new message writer that will write into the given byte slice.
+    /// Constructs a new message writer that will write into the given byte
+    /// slice.
     pub fn new(data: &mut [u8]) -> MsgWriter {
         MsgWriter {
             data: Cursor::new(data),
@@ -424,7 +425,7 @@ impl<'a> MsgWriter<'a> {
         if len > 255 {
             Err(EncodeError::TooLong)
         } else {
-            try!(self.write_byte(len as u8));
+            self.write_byte(len as u8)?;
             self.write(data)
         }
     }
@@ -459,15 +460,15 @@ impl<'a> MsgWriter<'a> {
                     return Err(EncodeError::InvalidName);
                 }
 
-                try!(self.write_byte(seg.len() as u8));
-                try!(self.write(seg.as_bytes()));
+                self.write_byte(seg.len() as u8)?;
+                self.write(seg.as_bytes())?;
             }
 
             if !name.ends_with('.') {
                 if total_len + 1 > NAME_LIMIT {
                     return Err(EncodeError::InvalidName);
                 }
-                try!(self.write_byte(0));
+                self.write_byte(0)?;
             }
 
             Ok(())
@@ -528,7 +529,7 @@ impl<'a> MsgWriter<'a> {
 
     /// Writes a question item
     fn write_question(&mut self, question: &Question) -> Result<(), EncodeError> {
-        try!(self.write_name(&question.name));
+        self.write_name(&question.name)?;
 
         let mut qd: QuestionData = unsafe { zeroed() };
 
@@ -542,7 +543,7 @@ impl<'a> MsgWriter<'a> {
 
     /// Writes a resource record item
     fn write_resource(&mut self, resource: &Resource) -> Result<(), EncodeError> {
-        try!(self.write_name(&resource.name));
+        self.write_name(&resource.name)?;
 
         let mut rd: ResourceData = unsafe { zeroed() };
 
@@ -551,11 +552,11 @@ impl<'a> MsgWriter<'a> {
         rd.r_type = resource.r_type.to_u16().to_be();
         rd.r_class = resource.r_class.to_u16().to_be();
         rd.ttl = resource.ttl.to_be();
-        rd.length = try!(to_u16(rdata.len())).to_be();
+        rd.length = to_u16(rdata.len())?.to_be();
 
         let buf: [u8; 10] = unsafe { transmute(rd) };
 
-        try!(self.write(&buf));
+        self.write(&buf)?;
         self.write(rdata)
     }
 }
@@ -627,7 +628,7 @@ impl<'a> Message<'a> {
     pub fn decode(data: &[u8]) -> Result<Message, DecodeError> {
         let mut r = MsgReader::new(data);
 
-        let header = try!(r.read_header());
+        let header = r.read_header()?;
         let mut msg = Message {
             header: header.to_header(),
             // TODO: Cap these values to prevent abuse?
@@ -638,22 +639,22 @@ impl<'a> Message<'a> {
         };
 
         for _ in 0..header.qd_count {
-            msg.question.push(try!(r.read_question()));
+            msg.question.push(r.read_question()?);
         }
 
         for _ in 0..header.an_count {
-            msg.answer.push(try!(r.read_resource()));
+            msg.answer.push(r.read_resource()?);
         }
 
         for _ in 0..header.ns_count {
-            msg.authority.push(try!(r.read_resource()));
+            msg.authority.push(r.read_resource()?);
         }
 
         for _ in 0..header.ar_count {
-            msg.additional.push(try!(r.read_resource()));
+            msg.additional.push(r.read_resource()?);
         }
 
-        try!(r.finish());
+        r.finish()?;
         Ok(msg)
     }
 
@@ -672,25 +673,25 @@ impl<'a> Message<'a> {
             recursion_desired: hdr.recursion_desired,
             recursion_available: hdr.recursion_available,
             rcode: hdr.rcode,
-            qd_count: try!(to_u16(self.question.len())),
-            an_count: try!(to_u16(self.answer.len())),
-            ns_count: try!(to_u16(self.authority.len())),
-            ar_count: try!(to_u16(self.additional.len())),
+            qd_count: to_u16(self.question.len())?,
+            an_count: to_u16(self.answer.len())?,
+            ns_count: to_u16(self.authority.len())?,
+            ar_count: to_u16(self.additional.len())?,
         };
 
-        try!(w.write_header(&header));
+        w.write_header(&header)?;
 
         for q in &self.question {
-            try!(w.write_question(q));
+            w.write_question(q)?;
         }
         for r in &self.answer {
-            try!(w.write_resource(r));
+            w.write_resource(r)?;
         }
         for r in &self.authority {
-            try!(w.write_resource(r));
+            w.write_resource(r)?;
         }
         for r in &self.additional {
-            try!(w.write_resource(r));
+            w.write_resource(r)?;
         }
 
         Ok(w.into_bytes())
@@ -769,8 +770,8 @@ pub struct Header {
     pub qr: Qr,
     /// Kind of query
     pub op: OpCode,
-    /// In a response, indicates that the responding name server is an authority
-    /// for the domain name in question section.
+    /// In a response, indicates that the responding name server is an
+    /// authority for the domain name in question section.
     pub authoritative: bool,
     /// Indicates whether the message was truncated due to length greater than
     /// that permitted on the transmission channel.
@@ -796,7 +797,7 @@ impl Header {
     /// Constructs a new `Header` with the given id value.
     pub fn with_id(id: u16) -> Header {
         Header {
-            id: id,
+            id,
             ..Default::default()
         }
     }
@@ -883,9 +884,9 @@ impl Question {
     /// Constructs a new `Question`.
     pub fn new(name: String, q_type: RecordType, q_class: Class) -> Question {
         Question {
-            name: name,
-            q_type: q_type,
-            q_class: q_class,
+            name,
+            q_type,
+            q_class,
         }
     }
 }
@@ -911,10 +912,10 @@ impl<'a> Resource<'a> {
     /// Constructs a new `Resource`.
     pub fn new(name: String, r_type: RecordType, r_class: Class, ttl: u32) -> Resource<'a> {
         Resource {
-            name: name,
-            r_type: r_type,
-            r_class: r_class,
-            ttl: ttl,
+            name,
+            r_type,
+            r_class,
+            ttl,
             data: Owned(Vec::new()),
             offset: 0,
         }
@@ -928,8 +929,8 @@ impl<'a> Resource<'a> {
     /// Decodes resource data into the given `Record` type.
     pub fn read_rdata<R: Record>(&self) -> Result<R, DecodeError> {
         let mut r = MsgReader::with_offset(&self.data, self.offset);
-        let res = try!(Record::decode(&mut r));
-        try!(r.finish());
+        let res = Record::decode(&mut r)?;
+        r.finish()?;
         Ok(res)
     }
 
@@ -937,7 +938,7 @@ impl<'a> Resource<'a> {
     pub fn write_rdata<R: Record>(&mut self, record: &R) -> Result<(), EncodeError> {
         let mut buf = [0; MESSAGE_LIMIT];
         let mut w = MsgWriter::new(&mut buf[..]);
-        try!(record.encode(&mut w));
+        record.encode(&mut w)?;
         self.data = Owned(w.into_bytes().to_vec());
         self.offset = 0;
         Ok(())
@@ -1095,9 +1096,10 @@ fn to_u16(n: usize) -> Result<u16, EncodeError> {
 
 #[cfg(test)]
 mod test {
-    use super::{is_valid_name, EncodeError, MESSAGE_LIMIT};
-    use super::{Header, Message, OpCode, Qr, Question, RCode};
-    use super::{MsgReader, MsgWriter};
+    use super::{
+        is_valid_name, EncodeError, Header, Message, MsgReader, MsgWriter, OpCode, Qr, Question,
+        RCode, MESSAGE_LIMIT,
+    };
     use record::{Class, RecordType};
 
     #[test]
