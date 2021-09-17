@@ -15,6 +15,6 @@ version = "0.2.0"
 authors = ["Murarth <murarth@gmail.com>"]
 
 [dependencies]
-idna = "0.1"
-log = "0.4"
-rand = "0.5"
+idna = "0.2.3"
+log = "0.4.14"
+rand = "0.8.4"
