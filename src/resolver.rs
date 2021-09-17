@@ -356,7 +356,7 @@ pub fn resolve_addr(addr: &IpAddr) -> io::Result<String> {
 /// # Example
 ///
 /// ```no_run
-/// use resolve::resolve_host;
+/// use sync_resolve::resolve_host;
 /// # use std::io;
 ///
 /// # fn _foo() -> io::Result<()> {

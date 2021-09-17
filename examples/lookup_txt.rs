@@ -1,8 +1,8 @@
 use std::env::args;
 use std::str;
 
-use resolve::record::Txt;
-use resolve::{DnsConfig, DnsResolver};
+use sync_resolve::record::Txt;
+use sync_resolve::{DnsConfig, DnsResolver};
 
 fn main() {
     let args = args().collect::<Vec<_>>();

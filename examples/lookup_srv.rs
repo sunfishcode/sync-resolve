@@ -1,7 +1,7 @@
 use std::env::args;
 
-use resolve::record::Srv;
-use resolve::{DnsConfig, DnsResolver};
+use sync_resolve::record::Srv;
+use sync_resolve::{DnsConfig, DnsResolver};
 
 fn main() {
     let args = args().collect::<Vec<_>>();

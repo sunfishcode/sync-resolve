@@ -2,7 +2,7 @@
 
 use std::env::args;
 
-use resolve::{DnsConfig, DnsResolver};
+use sync_resolve::{DnsConfig, DnsResolver};
 
 fn main() {
     let config = DnsConfig::with_name_servers(vec![

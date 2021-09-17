@@ -1,11 +1,11 @@
-# resolve
+# sync-resolve
 
-`resolve` is a pure Rust implementation of the DNS protocol.
+`sync-resolve` is a pure Rust implementation of the DNS protocol.
 
 It also provides high level facilities for hostname resolution and address
 reverse resolution.
 
-[Documentation](http://docs.rs/resolve/)
+[Documentation](http://docs.rs/sync-resolve/)
 
 ## Usage
 
@@ -13,7 +13,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-resolve = "0.2"
+sync_resolve = "0.2"
 ```
 
 ## License

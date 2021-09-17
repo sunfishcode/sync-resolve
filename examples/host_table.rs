@@ -1,4 +1,4 @@
-use resolve::hosts::{host_file, load_hosts};
+use sync_resolve::hosts::{host_file, load_hosts};
 
 fn main() {
     let path = host_file();

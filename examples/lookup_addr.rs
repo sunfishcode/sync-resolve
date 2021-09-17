@@ -1,6 +1,6 @@
 use std::env::args;
 
-use resolve::resolve_addr;
+use sync_resolve::resolve_addr;
 
 fn main() {
     let args = args().collect::<Vec<_>>();
