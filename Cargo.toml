@@ -1,22 +1,22 @@
 [package]
-
 name = "resolve"
 description = "DNS communication protocol"
-
 documentation = "https://docs.rs/resolve/"
-homepage = "https://github.com/murarth/resolve"
-repository = "https://github.com/murarth/resolve"
-
-keywords = [ "dns", "host", "resolver" ]
+repository = "https://github.com/sunfishcode/resolve"
+keywords = ["dns", "host", "resolver"]
+categories = ["network-programming"]
 license = "MIT/Apache-2.0"
-readme = "README.md"
-
 version = "0.2.0"
-authors = ["Murarth <murarth@gmail.com>"]
-
+authors = [
+    "Murarth <murarth@gmail.com>",
+    "Dan Gohman <dev@sunfishcode.online>"
+]
 edition = "2018"
 
 [dependencies]
 idna = "0.2.3"
 log = "0.4.14"
 rand = "0.8.4"
+
+[badges]
+maintenance = { status = "passively-maintained" }
