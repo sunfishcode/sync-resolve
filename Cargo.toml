@@ -6,7 +6,7 @@ repository = "https://github.com/sunfishcode/sync-resolve"
 keywords = ["dns", "host", "resolver"]
 categories = ["network-programming"]
 license = "MIT/Apache-2.0"
-version = "0.3.0"
+version = "0.3.1-alpha.0"
 authors = [
     "Murarth <murarth@gmail.com>",
     "Dan Gohman <dev@sunfishcode.online>"
