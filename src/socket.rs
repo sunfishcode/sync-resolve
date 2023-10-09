@@ -14,7 +14,7 @@ pub struct DnsSocket {
 impl DnsSocket {
     /// Returns a `DnsSocket`, bound to an unspecified address.
     pub fn new() -> io::Result<DnsSocket> {
-        DnsSocket::bind(&SocketAddr::new(
+        DnsSocket::bind(SocketAddr::new(
             IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)),
             0,
         ))

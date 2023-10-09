@@ -144,14 +144,14 @@ impl<'a> MsgReader<'a> {
     pub fn read_u16(&mut self) -> Result<u16, DecodeError> {
         let mut buf = [0; 2];
         self.read(&mut buf)?;
-        Ok(u16::from_be(unsafe { transmute(buf) }))
+        Ok(u16::from_be_bytes(buf))
     }
 
     /// Reads a big-endian unsigned 32 bit integer.
     pub fn read_u32(&mut self) -> Result<u32, DecodeError> {
         let mut buf = [0; 4];
         self.read(&mut buf)?;
-        Ok(u32::from_be(unsafe { transmute(buf) }))
+        Ok(u32::from_be_bytes(buf))
     }
 
     /// Reads `n` bytes, which are inserted at the end of the given buffer.
@@ -480,13 +480,13 @@ impl<'a> MsgWriter<'a> {
 
     /// Writes an unsigned 16 bit integer in big-endian format.
     pub fn write_u16(&mut self, data: u16) -> Result<(), EncodeError> {
-        let data: [u8; 2] = unsafe { transmute(data.to_be()) };
+        let data: [u8; 2] = data.to_be_bytes();
         self.write(&data)
     }
 
     /// Writes an unsigned 32 bit integer in big-endian format.
     pub fn write_u32(&mut self, data: u32) -> Result<(), EncodeError> {
-        let data: [u8; 4] = unsafe { transmute(data.to_be()) };
+        let data: [u8; 4] = data.to_be_bytes();
         self.write(&data)
     }
 
