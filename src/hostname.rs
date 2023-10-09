@@ -13,7 +13,7 @@ extern "system" {
 /// Returns the system hostname.
 pub fn get_hostname() -> io::Result<String> {
     let mut buf = [0 as c_char; 256];
-    let res = unsafe { gethostname(buf.as_mut_ptr(), buf.len() as usize) };
+    let res = unsafe { gethostname(buf.as_mut_ptr(), buf.len()) };
 
     match res {
         -1 => Err(io::Error::last_os_error()),

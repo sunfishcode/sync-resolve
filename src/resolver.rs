@@ -208,6 +208,7 @@ impl DnsResolver {
     }
 
     /// Sends a message to the DNS server and attempts to read a response.
+    #[allow(dropping_references)] // for the workaround below
     pub fn send_message<'buf>(
         &self,
         out_msg: &Message,
@@ -233,7 +234,7 @@ impl DnsResolver {
 
             info!("resolver sending message to {}", ns_addr);
 
-            self.sock.send_message(out_msg, &ns_addr)?;
+            self.sock.send_message(out_msg, ns_addr)?;
 
             loop {
                 self.sock.get().set_read_timeout(Some(timeout))?;
